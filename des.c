@@ -10,9 +10,9 @@ int expansion[48] = {
   24,25,26,27,28,29,
   28,29,30,31,32,1};
 
-char* subArray(char* array, int index, int length)
+unsigned char* subArray(unsigned char* array, int index, int length)
 {
-    char* res = malloc(sizeof(char) * length);
+    char* res = malloc(sizeof(unsigned char) * length);
     int i;
 
     for(i = 0; i <= length; i++)
