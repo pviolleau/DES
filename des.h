@@ -1,4 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-char* subArray(char* array, int index, int length);
+unsigned char* subArray(unsigned char* array, int index, int length);
+unsigned char* expansionArray(unsigned char* array, int length);
