@@ -39,11 +39,11 @@ unsigned char* expansionArray(unsigned char* array, int length)
 unsigned char* f(unsigned char* array)
 {
   unsigned char* res=malloc(sizeof(unsigned char) * 48);
-  unsigned char* expandArray=malloc(sizeof(unsigned char) * 64);
-  expansionArray(unsigned char* array);
+  unsigned char* expandedArray;
+  expandedArray=expansionArray(array);
   // comparaison avec la clé
-  unsigned char* ArrayGauche=malloc(sizeof(unsigned char) * 32);
-  unsigned char* ArrayDroite=malloc(sizeof(unsigned char) * 32);
+  unsigned char* ArrayGauche;
+  unsigned char* ArrayDroite;
 
   ArrayGauche=subArray(expandArray, 0, 32);
   ArrayDroite=subArray(expandArray, 32, 32);
