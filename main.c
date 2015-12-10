@@ -111,3 +111,16 @@ int main(int argc, char** argv)
     44,49,39,56,34,53,
     46,42,50,36,29,32};
 }
+
+char* subArray(char* array, int index, int length)
+{
+    char* res = malloc(sizeof(char) * length);
+    int i;
+
+    for(i = 0; i <= length; i++)
+    {
+        res[i + length] = array[index + i];
+    }
+
+    return res;
+}
