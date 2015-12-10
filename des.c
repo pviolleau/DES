@@ -23,12 +23,12 @@ unsigned char* subArray(char* array, int index, int length)
     return res;
 }
 
-unsigned char* expansionArray(unsigned char* array, int length)
+unsigned char* expansionArray(unsigned char* array)
 {
-    unsigned char* res = malloc(sizeof(unsigned char) * length);
+    unsigned char* res = malloc(sizeof(unsigned char) * 48);
     int i;
 
-    for(i = 0; i <= length; i++)
+    for(i = 0; i <= 48; i++)
     {
         res[i] = array[expansion[i]-1];
     }
