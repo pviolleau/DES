@@ -12,7 +12,7 @@ int expansion[48] = {
 
 unsigned char* subArray(char* array, int index, int length)
 {
-    char* res = malloc(sizeof(char) * length);
+    unsigned char* res = malloc(sizeof(char) * length);
     int i;
 
     for(i = 0; i <= length; i++)
@@ -30,7 +30,7 @@ unsigned char* expansionArray(unsigned char* array, int length)
 
     for(i = 0; i <= length; i++)
     {
-        res[i] = array[expansion[i]];
+        res[i] = array[expansion[i]-1];
     }
 
     return res;
