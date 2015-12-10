@@ -35,3 +35,17 @@ unsigned char* expansionArray(unsigned char* array, int length)
 
     return res;
 }
+
+unsigned char* f(unsigned char* array)
+{
+  unsigned char* expandArray=malloc(sizeof(unsigned char) * 64);
+  expansionArray(unsigned char* array);
+  // comparaison avec la clé
+  unsigned char* ArrayGauche=malloc(sizeof(unsigned char) * 32);
+  unsigned char* ArrayDroite=malloc(sizeof(unsigned char) * 32);
+  ArrayGauche=subArray(expandArray, 0, 32);
+  ArrayDroite=subArray(expandArray, 32, 32);
+  // S-box
+  // concaténation
+  // permutation finale
+}
