@@ -41,5 +41,5 @@ bytes f(bytes array)
 bytes getLeftPart64(bytes number) { return number & 0xFFFFFFFF00000000; }
 bytes getRightPart64(bytes number) { return number & 0xFFFFFFFF; }
 
-bytes getByteAtPos(bytes number, int pos) { return (number >> pos) & 0xFF; }
-bytes setByteAtPos(bytes number, int pos, bytes value) { return number & (value << pos); }
+bytes getByteAtPos(bytes number, int pos) { return (number >> pos * 8) & 0xFF; }
+bytes setByteAtPos(bytes number, int pos, bytes value) { return number & (value << pos * 8); }

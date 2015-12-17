@@ -112,7 +112,7 @@ int main(int argc, char** argv)
     46,42,50,36,29,32};
 
     bytes test = 0x0123456789abcdef;
+
     printf("Original : %lx\n", test);
-    printf("getLeftPart64 : %lx\n", getLeftPart64(test));
-    printf("getRightPart64 : %lx\n", getRightPart64(test));
+    printf("getByteAtPos : %lx\n", getByteAtPos(test, 7));
 }
