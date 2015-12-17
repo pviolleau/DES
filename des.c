@@ -10,7 +10,7 @@ int expansion[48] = {
   24,25,26,27,28,29,
   28,29,30,31,32,1};
 
-unsigned char* subArray(char* array, int index, int length)
+unsigned char* subArray(unsigned char* array, int index, int length)
 {
     unsigned char* res = malloc(sizeof(char) * length);
     int i;
@@ -42,13 +42,10 @@ unsigned char* f(unsigned char* array)
   unsigned char* expandedArray;
   expandedArray=expansionArray(array);
   // comparaison avec la clé
-  unsigned char* ArrayGauche;
-  unsigned char* ArrayDroite;
-
-  ArrayGauche=subArray(expandArray, 0, 32);
-  ArrayDroite=subArray(expandArray, 32, 32);
+  unsigned char* ArrayGauche=subArray(expandedArray, 0, 32);
+  unsigned char* ArrayDroite=subArray(expandedArray, 32, 32);
   // S-box
   // concaténation
   // permutation finale
-  return unsigned char* res;
+  return res;
 }
