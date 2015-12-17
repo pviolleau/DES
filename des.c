@@ -28,8 +28,8 @@ bytes f(bytes array)
   bytes res = 0;
   bytes expandedArray = expansionArray(array);
   // comparaison avec la clé
-  bytes ArrayGauche = getLeftPart64(expandedArray);
-  bytes ArrayDroite = getRightPart64(expandedArray);
+  bytes arrayGauche = getLeftPart64(expandedArray);
+  bytes arrayDroite = getRightPart64(expandedArray);
   // S-box
   // concaténation
   // permutation finale
@@ -38,8 +38,8 @@ bytes f(bytes array)
 
 
 
-bytes getLeftPart64(bytes number) { return number | 0xFFFFFFFF00000000; }
-bytes getRightPart64(bytes number) { return number | 0xFFFFFFFF; }
+bytes getLeftPart64(bytes number) { return number & 0xFFFFFFFF00000000; }
+bytes getRightPart64(bytes number) { return number & 0xFFFFFFFF; }
 
 bytes getByteAtPos(bytes number, int pos) { return (number >> pos) | 0xFF; }
 bytes setByteAtPos(bytes number, int pos, bytes value) { return number | (value << pos); }

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define bytes unsigned int
+#define bytes long unsigned int
 
 bytes getLeftPart64(bytes number);
 bytes getRightPart64(bytes number);
