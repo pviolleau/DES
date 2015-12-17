@@ -2,9 +2,13 @@
 #include <stdlib.h>
 
 #define bytes unsigned int
-#define getFirstPart(number) { return number & 0xFFFFFFFF; }
-#define getSecondPart(number) { return number & 0xFFFFFFFF00000000; }
 
-unsigned char* subArray(unsigned char* array, int index, int length);
-unsigned char* expansionArray(unsigned char* array);
-unsigned char* f(unsigned char* array);
+bytes getLeftPart64(bytes number);
+bytes getRightPart64(bytes number);
+
+bytes getByteAtPos(bytes number, int pos);
+
+bytes setByteAtPos(bytes number, int pos, bytes value);
+
+bytes expansionArray(bytes array);
+bytes f(bytes array);

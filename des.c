@@ -10,42 +10,43 @@ int expansion[48] = {
   24,25,26,27,28,29,
   28,29,30,31,32,1};
 
-unsigned char* subArray(unsigned char* array, int index, int length)
+bytes expansionArray(bytes array)
 {
-    unsigned char* res = malloc(sizeof(char) * length);
-    int i;
-
-    for(i = 0; i <= length; i++)
-    {
-        res[i + length] = array[index + i];
-    }
-
-    return res;
-}
-
-unsigned char* expansionArray(unsigned char* array)
-{
-    unsigned char* res = malloc(sizeof(unsigned char) * 48);
+    bytes res = 0;
     int i;
 
     for(i = 0; i <= 48; i++)
     {
-        res[i] = array[expansion[i]-1];
+        setByteAtPos(res, i, getByteAtPos(array, expansion[i] - 1));
     }
 
     return res;
 }
 
-unsigned char* f(unsigned char* array)
+bytes f(bytes array)
 {
-  unsigned char* res=malloc(sizeof(unsigned char) * 48);
-  unsigned char* expandedArray;
-  expandedArray=expansionArray(array);
+  bytes res = 0;
+  bytes expandedArray = expansionArray(array);
   // comparaison avec la clé
-  unsigned char* ArrayGauche=subArray(expandedArray, 0, 32);
-  unsigned char* ArrayDroite=subArray(expandedArray, 32, 32);
+  bytes ArrayGauche = getLeftPart64(expandedArray);
+  bytes ArrayDroite = getRightPart64(expandedArray);
   // S-box
   // concaténation
   // permutation finale
   return res;
+}
+
+
+
+bytes getLeftPart64(bytes number) { return number | 0xFFFFFFFF00000000; }
+bytes getRightPart64(bytes number) { return number | 0x00000000FFFFFFFF; }
+
+bytes getByteAtPos(bytes number, int pos) {
+    number = number >> pos;
+    return number | 0x000000000000000F;
+}
+
+bytes setByteAtPos(bytes number, int pos, bytes value) {
+    value = value << pos;
+    return number | value;
 }
