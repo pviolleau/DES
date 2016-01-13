@@ -130,85 +130,119 @@ uint32_t getByteAtPos(uint32_t number, int pos) { return (number >> pos * 8) & 0
 uint32_t setByteAtPos(uint32_t number, int pos, uint8_t value) { return number & (value << pos * 8); }
 
 uint64_t PermutationCle1(uint64_t bloc64){
+  //on initialise le résultat et un bloc "tampon"
   uint64_t temporaire=0x0;
   uint64_t res=0x0;
   int i=0;
   int position=0;
+  //On cherche a avoir un bloc de 56 bits à la fin
   for(;i<56;i++){
+    //position sera la position du bit à aller chercher
+    //dans le bloc passé en paramètre (en partant de la droite)
     position=64-PC1[i];
-    //printf("position: %lx\n", position);
+    //on décale jusqu'au bit voulu et on fait un et avec 0x01 pour n'obtenir que le bit voulu
+    //on le redécale ensuite de 55 moins l'itération
     temporaire=((bloc64 >> position)&0x01)<<(55-i);
-    //printf("temporaire: %lx\n", temporaire);
+    //on fait un ou exclusif entre res et temporaire qui ne contient qu'un bit
     res=res^temporaire;
-    //printf("res: %lx\n", res);
     temporaire=0x0;
     }
-    //printf("res: %lx\n", res);
-    return res;
+    //temporaire est rempli bit à bit en commencant par la gauche
+    //on s'assure de renvoyer un bit de 56
+    return res&0x00FFFFFFFFFFFFFF;
   }
 
 uint64_t PermutationCle2(uint64_t bloc56){
+  //même méthode que pour PermutationCle1 mais cette fois avec 48 bits
   uint64_t temporaire=0x0;
   uint64_t res=0x0;
   int i=0;
   int position=0;
   for(;i<48;i++){
     position=56-PC2[i];
-    //printf("position: %lx\n", position);
     temporaire=((bloc56 >> position)&0x01)<<(47-i);
-    //printf("temporaire: %lx\n", temporaire);
     res=res^temporaire;
-    //printf("res: %lx\n", res);
     temporaire=0x0;
   }
   res=res&0x0000FFFFFFFFFFFF;
-  //printf("res: %lx\n", res);
   return res;
 }
 
 uint64_t melangerclef(uint64_t clef56,int tour){
+  //on décale de 4 pour obtenir les 56 bits au milieu
   uint64_t res=clef56<<4;
-  //printf("clef: %lx\n", res);
+  //on sépare en 2
   uint32_t gauche = getLeftPart(res);
-  //printf("gauche: %lx\n", gauche);
   uint32_t droite = getRightPart(res)>>4;
-  //printf("droite: %lx\n", droite);
   uint32_t temporaire=0x0;
+  // au tour 1,2,9 ou 16 on ne décale que de un
  if(tour==1||tour==2||tour==9||tour==16){
+   //on récupère seulement le 5e bit (le 1er bit si l'on ne considère
+   //pas les 4 0 devant)
+   //on le shift de 27 pour le mettre en dernière position
+   //on shift le bloc de 1 pour laisser place au bit que l'on
+   //vient de récupérer
     temporaire=((gauche&0x08000000)>>27)^((gauche<<1)&0x0FFFFFFF);
-    //printf("gauche&0x080000: %lx\n", (gauche&0x08000000)>>27);
     gauche=temporaire;
-    //printf("gauche: %lx\n", gauche);
     temporaire=0x0;
+    //même principe mais pour le côté droit
     temporaire=((droite&0x08000000)>>27)^((droite<<1)&0x0FFFFFFF);
-    //printf("droite&0x080000: %lx\n", (droite&0x08000000)>>27);
     droite=temporaire;
-    //printf("droite: %lx\n", droite);
     temporaire=0x0;
   }
   else
   {
+    //même principe mais cette fois avec 2 bits
     temporaire=((gauche&0x0c000000)>>26)^((gauche<<2)&0x0FFFFFFF);
-    //printf("gauche&0x0c0000: %lx\n", (gauche&0x0c000000)>>26);
     gauche=temporaire;
-    //printf("gauche: %lx\n", gauche);
     temporaire=0x0;
     temporaire=((droite&0x0c000000)>>26)^((droite<<2)&0x0FFFFFFF);
-    //printf("droite&0x0c0000: %lx\n", (droite&0x0c000000)>>26);
     droite=temporaire;
-    //printf("droite: %lx\n", droite);
+    temporaire=0x0;
+  }
+  //on reconcatene les 2 et on a 8 bits nuls et 56 bits qui forment la clef
+  res=0x0;
+  res=gauche;
+  res=res<<28;
+  res=res^droite;
+  return res;
+}
+
+uint64_t melangerclefd(uint64_t clef56,int tour){
+  //même principe mais au lieu de prendre le 1er ou 2e bit et
+  //de les décaler vers la fin on prend le ou les 2 derniers
+  //et on les décale au début
+  //autre changement, le tour un est traiter comme les autres
+  uint64_t res=clef56<<4;
+  uint32_t gauche = getLeftPart(res);
+  uint32_t droite = getRightPart(res)>>4;
+  uint32_t temporaire=0x0;
+ if(tour==2||tour==9||tour==16){
+    temporaire=((gauche&0x00000001)<<27)^((gauche>>1)&0x07FFFFFF);
+    gauche=temporaire;
+    temporaire=0x0;
+    temporaire=((droite&0x00000001)<<27)^((droite>>1)&0x07FFFFFF);
+    droite=temporaire;
+    temporaire=0x0;
+  }
+  else
+  {
+    temporaire=((gauche&0x00000003)<<26)^((gauche>>2)&0x03FFFFFF);
+    gauche=temporaire;
+    temporaire=0x0;
+    temporaire=((droite&0x00000003)<<26)^((droite>>2)&0x03FFFFFF);
+    droite=temporaire;
     temporaire=0x0;
   }
   res=0x0;
   res=gauche;
   res=res<<28;
   res=res^droite;
-  //printf("%i:res: %lx\n",tour, res);
-  //printf("res: %lx\n", res);
   return res;
 }
 
 uint64_t permutation(uint64_t bloc64){
+  //même principe que les autres permutations
   uint64_t temporaire=0x0;
   uint64_t res=0x0;
   int i=0;
@@ -223,6 +257,7 @@ uint64_t permutation(uint64_t bloc64){
 }
 
 uint64_t permutationInv(uint64_t bloc64){
+  //même principe que permutation mais avec une autre matrice
   uint64_t temporaire=0x0;
   uint64_t res=0x0;
   int i=0;
@@ -237,6 +272,7 @@ uint64_t permutationInv(uint64_t bloc64){
 }
 
 uint32_t permutationf(uint32_t bloc32){
+  //toujours le même principe
   uint64_t temporaire=0x0;
   uint64_t res=0x0;
   int i=0;
@@ -251,6 +287,9 @@ uint32_t permutationf(uint32_t bloc32){
 }
 
 uint64_t expansion(uint32_t bloc32){
+  //même principe que les permutations sauf que cette fois ci
+  //on passe d'un bloc de 32bits à un bloc de 48 en copiant
+  //certains bits
   uint64_t temporaire=0x0;
   uint64_t res=0x0;
   int i=0;
@@ -266,35 +305,57 @@ uint64_t expansion(uint32_t bloc32){
 }
 
 uint32_t s_box(uint64_t bloc48){
+  //on initialise les données
   uint32_t res=0x0;
   uint8_t position=0x0;
   uint32_t temporaire=0x0;
   int i=1;
+  //on sépare le bloc de 48 bits en 8 blocs de 6
   for(;i<9;i++){
-    position=((bloc48)>>(48-6*i)) & 0xFF;
-    //printf("position %lx\n", position);
+    //on récupère le ième groupe de 6 bits
+    position=((bloc48)>>(48-6*i)) & 0x3F;
+    //le numéro de la colonne est égale aux bits 2,3,4 et 5
+    //on le shift de 1 pour tout avoir sur 4 bits
     int colonne=(int)((position&0x1e)>>1);
+    //pour la ligne ce sont les 1er et 6e bits, on les regroupe
     int ligne=(int)((position&0x02)>>4)^(position&0x01);
-    //printf("colonne: %lx\n", colonne);
-    //printf("ligne: %lx\n", ligne);
+    //on cherche les valeurs correspondantes dans les S_box
     temporaire=SBOX[i-1][ligne][colonne];
-    //printf("temporaire %lx\n", temporaire);
+    //on décale au bon endroit
     temporaire=temporaire<<(32-4*i);
-    //printf("temporaire %lx\n", temporaire);
     res=res^temporaire;
-    //printf("res %lx\n", res);
     temporaire=0x0;
   }
-  //printf("res %lx\n", res);
   return res;
 }
 
 uint32_t f(uint32_t blocGauche, uint32_t blocDroit, int i){
+  //la fonction f qui regroupe toute les autres fonctions
+  uint32_t res;
+  int j=1;
+  //on permute la clef K
+  uint64_t clef=PermutationCle1(K);
+  //on la mélange pour obtenir la clef correspondant au bon tour
+  for(;j<i+1;j++){
+    //on appelle la fonction mélanger
+    clef=(melangerclef(clef,j));}
+    //on la permute une dernière fois
+  clef=PermutationCle2(clef);
+  //le résultat est le ou exclusif du bloc gauche et de
+  //la permutation final du résultat obtenu avec le ou exclusif
+  //entre les s_box et la clef (pour utiliser la fonction s_box
+  //on expanse d'abord le bloc droit)
+  res=(permutationf(s_box((expansion(blocDroit))^clef)))^blocGauche;
+  return res;
+}
+
+uint32_t fd(uint32_t blocGauche, uint32_t blocDroit, int i){
+  //la fonction f qui permet de décoder seul le mélange change
   uint32_t res;
   int j=1;
   uint64_t clef=PermutationCle1(K);
   for(;j<i+1;j++){
-    clef=(melangerclef(clef,j));}
+    clef=(melangerclefd(clef,j));}
   clef=PermutationCle2(clef);
   res=(permutationf(s_box((expansion(blocDroit))^clef)))^blocGauche;
   printf("res: %lx\n", res);
@@ -302,11 +363,16 @@ uint32_t f(uint32_t blocGauche, uint32_t blocDroit, int i){
 }
 
 uint64_t DES_codage(uint64_t bloc64){
+  //la fonction des
    int j=1;
    uint32_t temporaire=0x0;
+   uint64_t res;
    for(;j<17;j++){
+     //la partie droite du résultat final partie gauche, droite et tour
      temporaire =f(getLeftPart(res),getRightPart(res),j);
+     //le bloc de droite se retrouve à gauche
      res = res << 32;
+     // on ajoute le bloc droit
      res=res^(temporaire);
      printf("res: %lx\n", res);
      temporaire=0x0;
@@ -314,22 +380,20 @@ uint64_t DES_codage(uint64_t bloc64){
    return res;
 }
 
-/*uint64_t DES_decodage(uint64_t bloc64){
-   int j=15;
-   uint64_t res=bloc64;
-   uint32_t gauche;
-   for(;j>0;j--){
-     gauche=getLeftPart(res);
-     gauche=f(gauche,j);
-     res = res << 32;
-     res=res^gauche;
-     printf("res: %lx\n", res);
-   }
-   /*gauche=getLeftPart(res);
-   res = res << 32;
-   res=res^(gauche);
-   return res;
-}*/
+uint64_t DES_decodage(uint64_t bloc64){
+//meme chose que DES_codage mais pour décoder
+int j=1;
+uint64_t res;
+uint32_t temporaire=0x0;
+for(;j<17;j++){
+  temporaire =fd(getLeftPart(res),getRightPart(res),j);
+  res = res << 32;
+  res=res^(temporaire);
+  printf("res: %lx\n", res);
+  temporaire=0x0;
+}
+return res;
+}
 
 
 void main(){
@@ -341,5 +405,4 @@ void main(){
   printf("mot codé: %lx\n", mot);
   mot=permutationInv(mot);
   printf("mot final: %lx\n", mot);
-
 }
