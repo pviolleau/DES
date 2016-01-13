@@ -143,7 +143,7 @@ uint64_t PermutationCle1(uint64_t bloc64){
     //printf("res: %lx\n", res);
     temporaire=0x0;
     }
-    printf("res: %lx\n", res);
+    //printf("res: %lx\n", res);
     return res;
   }
 
@@ -161,7 +161,7 @@ uint64_t PermutationCle2(uint64_t bloc56){
     //printf("res: %lx\n", res);
     temporaire=0x0;
   }
-  res=res^0x0000FFFFFFFFFFFF;
+  res=res&0x0000FFFFFFFFFFFF;
   //printf("res: %lx\n", res);
   return res;
 }
@@ -174,7 +174,7 @@ uint64_t melangerclef(uint64_t clef56,int tour){
   uint32_t droite = getRightPart(res)>>4;
   //printf("droite: %lx\n", droite);
   uint32_t temporaire=0x0;
- if(tour==1||tour==2||tour==9||tour==16 ||tour==17 ||tour==18 ||tour ==25 ||tour==32){
+ if(tour==1||tour==2||tour==9||tour==16){
     temporaire=((gauche&0x08000000)>>27)^((gauche<<1)&0x0FFFFFFF);
     //printf("gauche&0x080000: %lx\n", (gauche&0x08000000)>>27);
     gauche=temporaire;
@@ -207,22 +207,6 @@ uint64_t melangerclef(uint64_t clef56,int tour){
   //printf("res: %lx\n", res);
   return res;
 }
-
-/*uint64_t vrai_cle(uint64_t bloc64){
-  uint64_t temporaire=0x0;
-  uint64_t res=0x0;
-  int i=0;
-  int position=0;
-  for(;i<56;i++){
-    position=64-CLEF[i];
-    temporaire=(bloc64 >> position);
-    temporaire=temporaire&0x01;
-    temporaire=temporaire<<(55-i);
-    res=res^temporaire;
-    temporaire=0x0;
-  }
-  return res;
-}*/
 
 uint64_t permutation(uint64_t bloc64){
   uint64_t temporaire=0x0;
@@ -288,63 +272,49 @@ uint32_t s_box(uint64_t bloc48){
   int i=1;
   for(;i<9;i++){
     position=((bloc48)>>(48-6*i)) & 0xFF;
-
     //printf("position %lx\n", position);
-
     int colonne=(int)((position&0x1e)>>1);
-    int ligne=(int)((position>>4)&0x21);
-    ligne =(ligne^(ligne>>4))^0x03;
-
+    int ligne=(int)((position&0x02)>>4)^(position&0x01);
     //printf("colonne: %lx\n", colonne);
     //printf("ligne: %lx\n", ligne);
-
     temporaire=SBOX[i-1][ligne][colonne];
-
     //printf("temporaire %lx\n", temporaire);
     temporaire=temporaire<<(32-4*i);
-
     //printf("temporaire %lx\n", temporaire);
     res=res^temporaire;
-
     //printf("res %lx\n", res);
-
     temporaire=0x0;
   }
+  //printf("res %lx\n", res);
   return res;
 }
 
-uint32_t f(uint32_t bloc32, int i){
-  printf("i: %lx\n", i);
+uint32_t f(uint32_t blocGauche, uint32_t blocDroit, int i){
   uint32_t res;
-  uint32_t clef=PermutationCle2(K);
-  int j=0;
+  int j=1;
+  uint64_t clef=PermutationCle1(K);
   for(;j<i+1;j++){
-    clef=PermutationCle2(clef);
-    printf("clef: %lx\n", clef);
-  }
-  printf("cleff: %lx\n", clef);
-  res=permutationf(s_box(expansion(bloc32)^clef));
+    clef=(melangerclef(clef,j));}
+  clef=PermutationCle2(clef);
+  res=(permutationf(s_box((expansion(blocDroit))^clef)))^blocGauche;
+  printf("res: %lx\n", res);
   return res;
 }
 
 uint64_t DES_codage(uint64_t bloc64){
-   int j=0;
-   uint64_t res=bloc64;
-   uint32_t gauche;
-   for(;j<16;j++){
-     gauche=getLeftPart(res);
-     gauche=f(gauche,j);
+   int j=1;
+   uint32_t temporaire=0x0;
+   for(;j<17;j++){
+     temporaire =f(getLeftPart(res),getRightPart(res),j);
      res = res << 32;
-     res=res^(gauche);
+     res=res^(temporaire);
      printf("res: %lx\n", res);
+     temporaire=0x0;
    }
-   gauche=getLeftPart(res);
-   res = res << 32;
-   res=res^(gauche);
    return res;
 }
 
-uint64_t DES_decodage(uint64_t bloc64){
+/*uint64_t DES_decodage(uint64_t bloc64){
    int j=15;
    uint64_t res=bloc64;
    uint32_t gauche;
@@ -357,18 +327,19 @@ uint64_t DES_decodage(uint64_t bloc64){
    }
    /*gauche=getLeftPart(res);
    res = res << 32;
-   res=res^(gauche);*/
+   res=res^(gauche);
    return res;
-}
+}*/
 
 
 void main(){
-  uint64_t u=0x0123456789abcdef;
-  u=(PermutationCle1(u));
-  printf("u: %lx\n", u);
-  int i = 1;
-  for(;i<16;i++){
-  u=(melangerclef(u,i));
-  printf("%i:u: %lx\n",i, PermutationCle2(melangerclef(u,i)));
-}
+  uint64_t mot=0x0123456789abcdef;
+  printf("mot: %lx\n", mot);
+  mot=permutation(mot);
+  printf("mot permuté: %lx\n", mot);
+  mot=DES_codage(mot);
+  printf("mot codé: %lx\n", mot);
+  mot=permutationInv(mot);
+  printf("mot final: %lx\n", mot);
+
 }
