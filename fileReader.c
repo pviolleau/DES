@@ -4,6 +4,7 @@ int getData(uint64_t** dataArray)
 {
     struct stat st;
     int size = 0;
+    int nbBlocs = 0;
     FILE* file = NULL;
 
     file = fopen("test_final.txt", "r+");
@@ -11,8 +12,6 @@ int getData(uint64_t** dataArray)
     if(file == NULL)
     {
         printf("Ce ficier n'existe pas !\n");
-
-        return 0;
     }
     else
     {
@@ -21,18 +20,23 @@ int getData(uint64_t** dataArray)
 
         printf("taille : %d\n", size);
 
-        *dataArray = malloc(sizeof(uint64_t) * size / 8);
+        nbBlocs = size / 8;
 
-        fread(*dataArray, 8, size / 8, file);
+        if(size % 8 > 0)
+            nbBlocs++;
 
-        return size;
+        *dataArray = malloc(sizeof(uint64_t) * nbBlocs);
+
+        fread(*dataArray, 8, nbBlocs, file);
     }
+
+    return nbBlocs;
 }
 
 int main(int argc, char** argv)
 {
     uint64_t* dataArray = NULL;
-    int size = getData(&dataArray);
+    int nbBlocs = getData(&dataArray);
     int i;
 
     if(dataArray == NULL)
@@ -43,7 +47,7 @@ int main(int argc, char** argv)
     {
         printf("Affichage contenu avec des uint64_t : \n");
 
-        for(i = 0; i < size; i++)
+        for(i = 0; i < nbBlocs; i++)
         {
             printf("%" PRIu64, dataArray[i]);
         }
