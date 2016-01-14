@@ -33,6 +33,22 @@ int getData(uint64_t** dataArray)
     return nbBlocs;
 }
 
+void printData(uint64_t** dataArray, int nbBlocs)
+{
+    FILE* file = NULL;
+
+    file = fopen("test_final_res.txt", "w+");
+
+    if(file == NULL)
+    {
+        printf("Ce ficier n'existe pas !\n");
+    }
+    else
+    {
+        fwrite(*dataArray, 8, nbBlocs, file);
+    }
+}
+
 int main(int argc, char** argv)
 {
     uint64_t* dataArray = NULL;
@@ -53,6 +69,8 @@ int main(int argc, char** argv)
         }
 
         printf("\n");
+
+        printData(&dataArray, nbBlocs);
 
         free(dataArray);
     }

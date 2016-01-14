@@ -345,6 +345,7 @@ uint32_t f(uint32_t blocGauche, uint32_t blocDroit, int i){
   //la permutation final du résultat obtenu avec le ou exclusif
   //entre les s_box et la clef (pour utiliser la fonction s_box
   //on expanse d'abord le bloc droit)
+printf("clef %d : %lx\n",i, clef);
   res=(permutationf(s_box((expansion(blocDroit))^clef)))^blocGauche;
   return res;
 }
